@@ -31,6 +31,7 @@ final BLANK_OUTPUT = new Output(
 class Transaction {
   int version = 1;
   int locktime = 0;
+  int time = 0;
   List<Input> ins = [];
   List<Output> outs = [];
 
@@ -171,6 +172,7 @@ class Transaction {
     toffset = 0;
     var input = ins[inIndex];
     writeUInt32(version);
+    writeUInt32(time);
     writeSlice(hashPrevouts);
     writeSlice(hashSequence);
     writeSlice(input.hash);
@@ -247,6 +249,7 @@ class Transaction {
   _byteLength(_ALLOW_WITNESS) {
     var hasWitness = _ALLOW_WITNESS && hasWitnesses();
     return (hasWitness ? 10 : 8) +
+        4 +
         varuint.encodingLength(ins.length) +
         varuint.encodingLength(outs.length) +
         ins.fold(0, (sum, input) => sum + 40 + varSliceSize(input.script!)) +
@@ -362,6 +365,7 @@ class Transaction {
 
     // Start writeBuffer
     writeInt32(version);
+    writeInt32(time);
 
     if (_ALLOW_WITNESS && hasWitnesses()) {
       writeUInt8(ADVANCED_TRANSACTION_MARKER);
@@ -407,6 +411,7 @@ class Transaction {
     Transaction tx = new Transaction();
     tx.version = _tx.version;
     tx.locktime = _tx.locktime;
+    tx.time = _tx.time;
     tx.ins = _tx.ins.map((input) {
       return Input.clone(input);
     }).toList();
@@ -475,6 +480,7 @@ class Transaction {
 
     final tx = new Transaction();
     tx.version = readInt32();
+    tx.time = readInt32();
 
     final marker = readUInt8();
     final flag = readUInt8();

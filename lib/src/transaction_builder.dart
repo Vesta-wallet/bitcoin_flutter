@@ -29,6 +29,7 @@ class TransactionBuilder {
     // Copy transaction fields
     txb.setVersion(transaction.version);
     txb.setLockTime(transaction.locktime);
+    txb.setTime(transaction.time);
 
     // Copy outputs (done first to avoid signature invalidation)
     transaction.outs.forEach((txOut) {
@@ -58,6 +59,11 @@ class TransactionBuilder {
     if (version < 0 || version > 0xFFFFFFFF)
       throw ArgumentError('Expected Uint32');
     _tx.version = version;
+  }
+
+  setTime(int time) {
+    if (time < 0 || time > 0xFFFFFFFF) throw ArgumentError('Expected Uint32');
+    _tx.time = time;
   }
 
   setLockTime(int locktime) {
